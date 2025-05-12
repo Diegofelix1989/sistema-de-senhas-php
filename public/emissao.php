@@ -1,0 +1,1 @@
+<?php echo 'Tela de Emissão de Senhas'; ?>

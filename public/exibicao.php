@@ -1,0 +1,1 @@
+<?php echo 'Tela de Exibição de Senhas e Publicidades'; ?>
