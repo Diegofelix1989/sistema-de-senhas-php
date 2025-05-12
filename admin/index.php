@@ -4,88 +4,107 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] !== 'admin') {
     header('Location: ../login.php');
     exit();
 }
-include_once __DIR__ . '/../../includes/conexao.php';
 
-// Fetch some data for the admin dashboard (example)
-$query = "SELECT * FROM users";
-$result = $conn->query($query);
+include_once __DIR__ . '/../includes/conexao.php';
 
+$nomeUsuario = $_SESSION['usuario']['nome'];
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Administração - Sistema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            display: flex;
-            margin: 0;
+            overflow-x: hidden;
         }
-        .sidebar {
-            width: 200px;
-            background-color: #f4f4f4;
-            padding: 15px;
-            height: 100vh;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+
+        #sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
         }
-        .sidebar a {
-            display: block;
-            color: #333;
-            text-decoration: none;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
+
+        #sidebar .nav-link {
+            color: #ccc;
         }
-        .sidebar a:hover {
-            background-color: #ddd;
+
+        #sidebar .nav-link.active,
+        #sidebar .nav-link:hover {
+            color: #fff;
+            background-color: #495057;
         }
-        .content {
-            flex: 1;
-            padding: 20px;
+
+        #header {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar-collapsed {
+            width: 80px;
+        }
+
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-collapsed .nav-link i {
+            margin-right: 0;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Menu</h2>
-        <a href="index.php">Dashboard</a>
-        <a href="users.php">Users</a>
-        <a href="settings.php">Settings</a>
-        <a href="logout.php">Logout</a>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div id="sidebar" class="p-3 text-white collapse show sidebar-expanded">
+        <button class="btn btn-sm btn-light mb-3" onclick="toggleSidebar()">☰</button>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="index.php"><i class="bi bi-house-door"></i> <span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="usuarios"><i class="bi bi-people"></i> <span>Usuários</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="filas"><i class="bi bi-list-ol"></i> <span>Filas</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="guiches"><i class="bi bi-window"></i> <span>Guichês</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="telas"><i class="bi bi-display"></i> <span>Telas</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="publicidades"><i class="bi bi-megaphone"></i> <span>Publicidades</span></a>
+            </li>
+        </ul>
     </div>
-    <div class="content">
-        <header>
-            <h1>Admin Dashboard</h1>
-        </header>
-        <main>
-            <h2>Welcome, Admin</h2>
-            <section>
-                <h3>User List</h3>
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['id']); ?></td>
-                                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['email']); ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </section>
-        </main>
-        <footer>
-            <p>&copy; <?php echo date('Y'); ?> Sistema de Filas</p>
-        </footer>
+
+    <!-- Conteúdo Principal -->
+    <div class="flex-grow-1">
+        <div id="header" class="p-3 d-flex justify-content-between align-items-center border-bottom">
+            <h4 class="mb-0">Painel Administrativo</h4>
+            <div>
+                <span class="me-3">Logado como: <strong><?= htmlspecialchars($nomeUsuario) ?></strong></span>
+                <a href="../logout.php" class="btn btn-danger btn-sm">Sair</a>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <h5>Bem-vindo, <?= htmlspecialchars($nomeUsuario) ?>!</h5>
+            <p>Use o menu lateral para navegar entre as funcionalidades administrativas do sistema.</p>
+        </div>
     </div>
+</div>
+
+<!-- Ícones Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('sidebar-collapsed');
+    }
+</script>
 </body>
 </html>
