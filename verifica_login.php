@@ -17,6 +17,6 @@ if ($usuario && password_verify($senha, $usuario['senha'])) {
         header("Location: atendente/index.php");
     }
 } else {
-    echo "<script>alert('Credenciais inválidas'); window.location.href='login.php';</script>";
+    echo "<script>alert('Credenciais inválidas'); window.location.href='index.php';</script>";
 }
 ?>

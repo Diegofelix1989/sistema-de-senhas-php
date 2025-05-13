@@ -67,3 +67,7 @@ CREATE TABLE senhas (
     FOREIGN KEY (fila_id) REFERENCES filas(id) ON DELETE CASCADE,
     FOREIGN KEY (chamada_por) REFERENCES usuarios(id) ON DELETE SET NULL
 );
+
+ALTER TABLE senhas
+ADD COLUMN atendimento_iniciado_em TIMESTAMP NULL,
+ADD COLUMN atendimento_finalizado_em TIMESTAMP NULL;
