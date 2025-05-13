@@ -77,6 +77,10 @@ $nomeUsuario = $_SESSION['usuario']['nome'];
             <li class="nav-item">
                 <a class="nav-link" href="publicidades"><i class="bi bi-megaphone"></i> <span>Publicidades</span></a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="locais"><i class="bi bi-pin-map-fill"></i> <span>Locais</span></a>
+            </li>
+            
         </ul>
     </div>
 
