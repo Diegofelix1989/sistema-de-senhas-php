@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fila_id'])) {
                 <?php endforeach; ?>
             </div>
 
-            <a href="index.php" class="btn btn-secondary mt-4">Voltar</a>
+            <a href="..\index.php" class="btn btn-secondary mt-4">Voltar</a>
         <?php endif; ?>
     </div>
 </body>

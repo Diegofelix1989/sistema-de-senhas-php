@@ -233,14 +233,14 @@ $publicidades = $pdo->query($sql)->fetchAll();
                     <i class="fas fa-ad me-2"></i>Gerenciamento de Publicidades
                 </h1>
                 <div>
-                    <a href="../logout.php" class="btn-custom-danger">
-                        <i class="fas fa-sign-out-alt me-1"></i> Sair
+                   
+                        
                     </a>
                 </div>
             </div>
             
             <div class="d-flex justify-content-between align-items-center">
-                <a href="../admin.php" class="btn-custom-light back-button">
+                <a href="../index.php" class="btn-custom-light back-button">
                     <i class="fas fa-arrow-left me-1"></i> Voltar ao Painel
                 </a>
                 <a href="create.php" class="btn-custom-secondary">

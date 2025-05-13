@@ -20,7 +20,7 @@ $guiches = $pdo->query($sql)->fetchAll();
 </head>
 <body class="p-4">
 <h3>Guichês <a href="create.php" class="btn btn-success btn-sm">Novo</a>
-    <a href="../logout.php" class="btn btn-danger btn-sm float-end">Sair</a>
+    <a href="../index.php" class="btn btn-danger btn-sm float-end">Voltar</a>
 </h3>
 <table class="table table-striped mt-3">
     <thead><tr><th>ID</th><th>Nome</th><th>Local</th><th>Fila</th><th>Ações</th></tr></thead>

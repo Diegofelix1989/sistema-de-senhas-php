@@ -16,7 +16,7 @@ $usuarios = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="p-4">
-    <h3>Usuários <a href="create.php" class="btn btn-success btn-sm">Novo</a> <a href="../logout.php" class="btn btn-danger btn-sm float-end">Sair</a></h3>
+    <h3>Usuários <a href="create.php" class="btn btn-success btn-sm">Novo</a> <a href="../index.php" class="btn btn-danger btn-sm float-end">Voltar</a></h3>
     <table class="table table-striped mt-3">
         <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Tipo</th><th>Ações</th></tr></thead>
         <tbody>

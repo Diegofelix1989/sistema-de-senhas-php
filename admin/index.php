@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] !== 'admin') {
-    header('Location: ../login.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -79,6 +79,9 @@ $nomeUsuario = $_SESSION['usuario']['nome'];
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="locais"><i class="bi bi-pin-map-fill"></i> <span>Locais</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../public/emissao.php"><i class="bi bi-key"></i> <span>Gerar Senha</span></a>
             </li>
             
         </ul>
