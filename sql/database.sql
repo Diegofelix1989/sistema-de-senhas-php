@@ -71,3 +71,7 @@ CREATE TABLE senhas (
 ALTER TABLE senhas
 ADD COLUMN atendimento_iniciado_em TIMESTAMP NULL,
 ADD COLUMN atendimento_finalizado_em TIMESTAMP NULL;
+
+ALTER TABLE senhas
+ADD COLUMN guiche_id INT AFTER chamada_por,
+ADD CONSTRAINT fk_guiche_id FOREIGN KEY (guiche_id) REFERENCES guiches(id) ON DELETE SET NULL;
