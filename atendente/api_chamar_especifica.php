@@ -19,11 +19,10 @@ try {
         SELECT 
             s.id, 
             s.numero, 
-            s.criada_em, 
+            s.criado_em, 
             s.status,
             f.id AS fila_id, 
-            f.nome AS fila_nome, 
-            f.sigla AS fila_sigla
+            f.nome AS fila_nome
         FROM 
             senhas s
         JOIN 
@@ -31,6 +30,7 @@ try {
         WHERE 
             s.id = ?
     ";
+    //f.sigla AS fila_sigla
     
     $stmt_check = $pdo->prepare($sql_check);
     $stmt_check->execute([$senha_id]);
