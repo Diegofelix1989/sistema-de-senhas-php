@@ -75,3 +75,13 @@ ADD COLUMN atendimento_finalizado_em TIMESTAMP NULL;
 ALTER TABLE senhas
 ADD COLUMN guiche_id INT AFTER chamada_por,
 ADD CONSTRAINT fk_guiche_id FOREIGN KEY (guiche_id) REFERENCES guiches(id) ON DELETE SET NULL;
+
+ALTER TABLE senhas
+ADD COLUMN guiche_id INT NULL;
+
+ALTER TABLE senhas
+ADD CONSTRAINT fk_guiche
+FOREIGN KEY (guiche_id) REFERENCES guiches(id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
