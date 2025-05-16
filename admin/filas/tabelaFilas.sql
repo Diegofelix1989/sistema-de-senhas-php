@@ -1,6 +1,0 @@
-CREATE TABLE filas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    local_id INT NOT NULL,
-    FOREIGN KEY (local_id) REFERENCES locais(id)
-);

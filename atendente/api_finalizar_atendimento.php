@@ -53,7 +53,7 @@ try {
     $sql_update = "
         UPDATE senhas
         SET 
-            status = 'atendido',
+            status = 'atendida',
             atendimento_finalizado_em = ?
         WHERE 
             id = ?

@@ -83,6 +83,9 @@ $nomeUsuario = $_SESSION['usuario']['nome'];
             <li class="nav-item">
                 <a class="nav-link" href="../public/emissao.php"><i class="bi bi-key"></i> <span>Gerar Senha</span></a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../atendente/atendente.php"><i class="bi bi-headset"></i> <span>Painel Atendente</span></a>
+            </li>
             
         </ul>
     </div>
