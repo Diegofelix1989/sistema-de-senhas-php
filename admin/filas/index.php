@@ -1,120 +1,6 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] !== 'admin') {
-    header('Location: ../index.php');
-    exit();
-}
-include_once __DIR__ . '/../../includes/conexao.php';
-
-// Buscar todos os locais para os dropdowns dos modais
-$stmtLocais = $pdo->query("SELECT id, nome FROM locais ORDER BY nome");
-$locais = $stmtLocais->fetchAll();
-
-// Buscar todas as filas com informações de local
-$stmt = $pdo->query("SELECT f.id, f.nome, f.tipo, f.local_id, l.nome AS local 
-                     FROM filas f 
-                     JOIN locais l ON f.local_id = l.id
-                     ORDER BY f.nome");
-$filas = $stmt->fetchAll();
-
-// Processar operações CRUD via AJAX
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = ['success' => false, 'message' => ''];
-    
-    // Criar nova fila
-    if (isset($_POST['action']) && $_POST['action'] === 'create') {
-        $nome = trim($_POST['nome']);
-        $tipo = $_POST['tipo'];
-        $local_id = (int)$_POST['local_id'];
-        
-        if (empty($nome)) {
-            $response['message'] = 'O nome da fila é obrigatório';
-        } else {
-            try {
-                $stmt = $pdo->prepare("INSERT INTO filas (nome, tipo, local_id) VALUES (?, ?, ?)");
-                $stmt->execute([$nome, $tipo, $local_id]);
-                $response['success'] = true;
-                $response['message'] = 'Fila criada com sucesso!';
-                $response['redirect'] = 'index.php';
-            } catch (PDOException $e) {
-                $response['message'] = 'Erro ao criar fila: ' . $e->getMessage();
-            }
-        }
-        
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit();
-    }
-    
-    // Atualizar fila existente
-    if (isset($_POST['action']) && $_POST['action'] === 'update') {
-        $id = (int)$_POST['id'];
-        $nome = trim($_POST['nome']);
-        $tipo = $_POST['tipo'];
-        $local_id = (int)$_POST['local_id'];
-        
-        if (empty($nome)) {
-            $response['message'] = 'O nome da fila é obrigatório';
-        } else {
-            try {
-                $stmt = $pdo->prepare("UPDATE filas SET nome = ?, tipo = ?, local_id = ? WHERE id = ?");
-                $stmt->execute([$nome, $tipo, $local_id, $id]);
-                $response['success'] = true;
-                $response['message'] = 'Fila atualizada com sucesso!';
-                $response['redirect'] = 'index.php';
-            } catch (PDOException $e) {
-                $response['message'] = 'Erro ao atualizar fila: ' . $e->getMessage();
-            }
-        }
-        
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit();
-    }
-    
-    // Excluir fila
-    if (isset($_POST['action']) && $_POST['action'] === 'delete') {
-        $id = (int)$_POST['id'];
-        
-        try {
-            $stmt = $pdo->prepare("DELETE FROM filas WHERE id = ?");
-            $stmt->execute([$id]);
-            $response['success'] = true;
-            $response['message'] = 'Fila excluída com sucesso!';
-            $response['redirect'] = 'index.php';
-        } catch (PDOException $e) {
-            $response['message'] = 'Erro ao excluir fila: ' . $e->getMessage();
-        }
-        
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit();
-    }
-    
-    // Buscar dados de uma fila para edição
-    if (isset($_POST['action']) && $_POST['action'] === 'get') {
-        $id = (int)$_POST['id'];
-        
-        try {
-            $stmt = $pdo->prepare("SELECT id, nome, tipo, local_id FROM filas WHERE id = ?");
-            $stmt->execute([$id]);
-            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($fila) {
-                $response['success'] = true;
-                $response['data'] = $fila;
-            } else {
-                $response['message'] = 'Fila não encontrada';
-            }
-        } catch (PDOException $e) {
-            $response['message'] = 'Erro ao buscar dados da fila: ' . $e->getMessage();
-        }
-        
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit();
-    }
-}
+// Incluir o controlador que contém toda a lógica de backend
+require_once 'filas_controller.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -156,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
+                                <th>Prefixo</th>
                                 <th>Tipo</th>
                                 <th>Local</th>
                                 <th class="text-end">Ações</th>
@@ -164,13 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <tbody>
                             <?php if (empty($filas)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center py-3">Nenhuma fila cadastrada.</td>
+                                    <td colspan="6" class="text-center py-3">Nenhuma fila cadastrada.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($filas as $fila): ?>
                                     <tr>
                                         <td><?= $fila['id'] ?></td>
                                         <td><?= htmlspecialchars($fila['nome']) ?></td>
+                                        <td><span class="badge bg-dark"><?= htmlspecialchars($fila['prefixo']) ?></span></td>
                                         <td>
                                             <?php if ($fila['tipo'] == 'comum'): ?>
                                                 <span class="badge bg-primary">Comum</span>
@@ -215,6 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="text" class="form-control" id="create-nome" name="nome" required>
                         </div>
                         <div class="mb-3">
+                            <label for="create-prefixo" class="form-label">Prefixo (máx. 5 caracteres)</label>
+                            <input type="text" class="form-control" id="create-prefixo" name="prefixo" maxlength="5" required>
+                            <div class="form-text">Código usado para identificar a fila nas senhas (ex: SG, AT)</div>
+                        </div>
+                        <div class="mb-3">
                             <label for="create-tipo" class="form-label">Tipo</label>
                             <select class="form-select" id="create-tipo" name="tipo" required>
                                 <option value="comum">Comum</option>
@@ -254,6 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="mb-3">
                             <label for="edit-nome" class="form-label">Nome</label>
                             <input type="text" class="form-control" id="edit-nome" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-prefixo" class="form-label">Prefixo (máx. 5 caracteres)</label>
+                            <input type="text" class="form-control" id="edit-prefixo" name="prefixo" maxlength="5" required>
+                            <div class="form-text">Código usado para identificar a fila nas senhas (ex: SG, AT)</div>
                         </div>
                         <div class="mb-3">
                             <label for="edit-tipo" class="form-label">Tipo</label>
@@ -325,6 +223,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }, 5000);
             }
             
+            // Normalizar prefixos (converter para maiúsculas)
+            function normalizarPrefixo(input) {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+            
+            // Aplicar normalização aos campos de prefixo
+            normalizarPrefixo(document.getElementById('create-prefixo'));
+            normalizarPrefixo(document.getElementById('edit-prefixo'));
+            
             // Criar nova fila
             const createForm = document.getElementById('createForm');
             createForm.addEventListener('submit', function(e) {
@@ -333,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const formData = new FormData(createForm);
                 formData.append('action', 'create');
                 
-                fetch('index.php', {
+                fetch('filas_controller.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -363,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     formData.append('action', 'get');
                     formData.append('id', id);
                     
-                    fetch('index.php', {
+                    fetch('filas_controller.php', {
                         method: 'POST',
                         body: formData
                     })
@@ -372,6 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (data.success) {
                             document.getElementById('edit-id').value = data.data.id;
                             document.getElementById('edit-nome').value = data.data.nome;
+                            document.getElementById('edit-prefixo').value = data.data.prefixo;
                             document.getElementById('edit-tipo').value = data.data.tipo;
                             document.getElementById('edit-local').value = data.data.local_id;
                             
@@ -395,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const formData = new FormData(editForm);
                 formData.append('action', 'update');
                 
-                fetch('index.php', {
+                fetch('filas_controller.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -440,7 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 formData.append('action', 'delete');
                 formData.append('id', id);
                 
-                fetch('index.php', {
+                fetch('filas_controller.php', {
                     method: 'POST',
                     body: formData
                 })

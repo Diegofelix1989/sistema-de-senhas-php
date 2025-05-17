@@ -20,10 +20,12 @@ CREATE TABLE locais (
 
 CREATE TABLE filas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100),
-    tipo ENUM('comum', 'prioritaria'),
-    local_id INT,
-    FOREIGN KEY (local_id) REFERENCES locais(id) ON DELETE CASCADE
+    nome VARCHAR(100) NOT NULL,
+    tipo ENUM('comum', 'prioritaria') NOT NULL,
+    prefixo VARCHAR(5) NOT NULL,
+    local_id INT NOT NULL,
+    FOREIGN KEY (local_id) REFERENCES locais(id) ON DELETE CASCADE,
+    UNIQUE (prefixo, local_id)
 );
 
 CREATE TABLE guiches (
