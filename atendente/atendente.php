@@ -528,6 +528,7 @@ $locais = $stmt->fetchAll();
     carregarProximasSenhas();
   });
   
+  
   // Voltar para configuração
   btnConfig.addEventListener('click', function() {
     if (senhaAtual) {
