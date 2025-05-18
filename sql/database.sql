@@ -27,6 +27,8 @@ CREATE TABLE filas (
     FOREIGN KEY (local_id) REFERENCES locais(id) ON DELETE CASCADE,
     UNIQUE (prefixo, local_id)
 );
+ 
+ALTER TABLE filas ADD COLUMN tamanho_senha INT DEFAULT 3;
 
 CREATE TABLE guiches (
     id INT AUTO_INCREMENT PRIMARY KEY,

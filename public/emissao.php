@@ -44,28 +44,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['fila_id'])) {
         $fila_id = (int)$_POST['fila_id'];
 
-        $sqlUltima = "SELECT MAX(numero) AS ultima FROM senhas WHERE fila_id = :fila_id";
-        $stmtUltima = $pdo->prepare($sqlUltima);
-        $stmtUltima->execute(['fila_id' => $fila_id]);
-        $ultima = $stmtUltima->fetch()['ultima'] ?? 0;
+        // Buscar informações da fila incluindo prefixo e tamanho_senha
+        $sqlFila = "SELECT nome, prefixo, tamanho_senha FROM filas WHERE id = :fila_id";
+        $stmtFila = $pdo->prepare($sqlFila);
+        $stmtFila->execute(['fila_id' => $fila_id]);
+        $filaInfo = $stmtFila->fetch(PDO::FETCH_ASSOC);
+        
+        if ($filaInfo) {
+            $nomeFila = $filaInfo['nome'];
+            $prefixo = $filaInfo['prefixo'];
+            $tamanhoSenha = $filaInfo['tamanho_senha'] ?? 3; // Default para 3 se não estiver definido
 
-        $novaSenha = $ultima + 1;
+            // Buscar o último número da fila
+            $sqlUltima = "SELECT MAX(numero) AS ultima FROM senhas WHERE fila_id = :fila_id";
+            $stmtUltima = $pdo->prepare($sqlUltima);
+            $stmtUltima->execute(['fila_id' => $fila_id]);
+            $ultima = $stmtUltima->fetch()['ultima'] ?? 0;
 
-        $sqlInsere = "INSERT INTO senhas (numero, fila_id) VALUES (:numero, :fila_id)";
-        $stmtInsere = $pdo->prepare($sqlInsere);
-        $stmtInsere->execute([
-            'numero' => $novaSenha,
-            'fila_id' => $fila_id
-        ]);
+            $novaSenha = $ultima + 1;
 
-        $sqlNomeFila = "SELECT nome FROM filas WHERE id = :fila_id";
-        $stmtNomeFila = $pdo->prepare($sqlNomeFila);
-        $stmtNomeFila->execute(['fila_id' => $fila_id]);
-        $nomeFila = $stmtNomeFila->fetchColumn();
+            // Inserir nova senha
+            $sqlInsere = "INSERT INTO senhas (numero, fila_id) VALUES (:numero, :fila_id)";
+            $stmtInsere = $pdo->prepare($sqlInsere);
+            $stmtInsere->execute([
+                'numero' => $novaSenha,
+                'fila_id' => $fila_id
+            ]);
 
-        $sigla = strtoupper(substr($nomeFila, 0, 1));
-        $senhaFormatada = $sigla . str_pad($novaSenha, 3, '0', STR_PAD_LEFT);
-        $dataHora = date('d/m/Y H:i:s');
+            // Formatar senha usando o prefixo e tamanho definidos no banco
+            $senhaFormatada = $prefixo . str_pad($novaSenha, $tamanhoSenha, '0', STR_PAD_LEFT);
+            $dataHora = date('d/m/Y H:i:s');
+        }
     } elseif (isset($_POST['trocar_local']) && isset($_POST['local_selecionado'])) {
         // Trocar para outro local disponível
         $_SESSION['local_selecionado'] = (int)$_POST['local_selecionado'];
@@ -173,6 +182,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .local-badge.active {
             background-color: #0d6efd;
             color: white;
+        }
+        .fila-info {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
         }
         @media print {
             body * {
@@ -283,6 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <?php endif; ?>
                                                         <?= htmlspecialchars($fila['nome']) ?>
                                                     </button>
+                                                    
                                                 </form>
                                             </div>
                                         <?php endforeach; ?>
