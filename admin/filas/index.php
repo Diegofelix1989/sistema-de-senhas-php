@@ -45,13 +45,14 @@ require_once 'filas_controller.php';
                                 <th>Prefixo</th>
                                 <th>Tipo</th>
                                 <th>Local</th>
+                                <th>Dígitos</th>
                                 <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($filas)): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center py-3">Nenhuma fila cadastrada.</td>
+                                    <td colspan="7" class="text-center py-3">Nenhuma fila cadastrada.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($filas as $fila): ?>
@@ -67,6 +68,7 @@ require_once 'filas_controller.php';
                                             <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($fila['local']) ?></td>
+                                        <td><span class="badge bg-info"><?= $fila['tamanho_senha'] ?></span></td>
                                         <td class="text-end table-actions">
                                             <button type="button" class="btn btn-sm btn-warning edit-btn" 
                                                     data-id="<?= $fila['id'] ?>">
@@ -123,6 +125,11 @@ require_once 'filas_controller.php';
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="create-tamanho-senha" class="form-label">Tamanho da Senha (dígitos)</label>
+                            <input type="number" class="form-control" id="create-tamanho-senha" name="tamanho_senha" min="1" max="6" value="3" required>
+                            <div class="form-text">Quantidade de dígitos numéricos nas senhas (ex: 3 = 001, 4 = 0001)</div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -168,6 +175,11 @@ require_once 'filas_controller.php';
                                     <option value="<?= $local['id'] ?>"><?= htmlspecialchars($local['nome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-tamanho-senha" class="form-label">Tamanho da Senha (dígitos)</label>
+                            <input type="number" class="form-control" id="edit-tamanho-senha" name="tamanho_senha" min="1" max="6" required>
+                            <div class="form-text">Quantidade de dígitos numéricos nas senhas (ex: 3 = 001, 4 = 0001)</div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -284,6 +296,7 @@ require_once 'filas_controller.php';
                             document.getElementById('edit-prefixo').value = data.data.prefixo;
                             document.getElementById('edit-tipo').value = data.data.tipo;
                             document.getElementById('edit-local').value = data.data.local_id;
+                            document.getElementById('edit-tamanho-senha').value = data.data.tamanho_senha || 3;
                             
                             const editModal = new bootstrap.Modal(document.getElementById('editModal'));
                             editModal.show();

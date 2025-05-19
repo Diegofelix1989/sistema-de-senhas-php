@@ -20,7 +20,7 @@ function responderJSON($data) {
  */
 function obterFilas() {
     global $pdo;
-    $stmt = $pdo->query("SELECT f.id, f.nome, f.tipo, f.prefixo, f.local_id, l.nome AS local 
+    $stmt = $pdo->query("SELECT f.id, f.nome, f.tipo, f.prefixo, f.local_id, f.tamanho_senha, l.nome AS local 
                          FROM filas f 
                          JOIN locais l ON f.local_id = l.id
                          ORDER BY f.nome");
@@ -41,7 +41,7 @@ function obterLocais() {
  */
 function obterFilaPorId($id) {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT id, nome, tipo, prefixo, local_id FROM filas WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, nome, tipo, prefixo, local_id, tamanho_senha FROM filas WHERE id = ?");
     $stmt->execute([$id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipo = $_POST['tipo'];
         $prefixo = strtoupper(trim($_POST['prefixo']));
         $local_id = (int)$_POST['local_id'];
+        $tamanho_senha = isset($_POST['tamanho_senha']) ? (int)$_POST['tamanho_senha'] : 3;
         
         if (empty($nome)) {
             $response['message'] = 'O nome da fila é obrigatório';
@@ -84,12 +85,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response['message'] = 'O prefixo da fila é obrigatório';
         } elseif (strlen($prefixo) > 5) {
             $response['message'] = 'O prefixo deve ter no máximo 5 caracteres';
+        } elseif ($tamanho_senha < 1 || $tamanho_senha > 6) {
+            $response['message'] = 'O tamanho da senha deve estar entre 1 e 6 dígitos';
         } elseif (prefixoExiste($prefixo, $local_id)) {
             $response['message'] = 'Este prefixo já está em uso para o local selecionado';
         } else {
             try {
-                $stmt = $pdo->prepare("INSERT INTO filas (nome, tipo, prefixo, local_id) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$nome, $tipo, $prefixo, $local_id]);
+                $stmt = $pdo->prepare("INSERT INTO filas (nome, tipo, prefixo, local_id, tamanho_senha) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$nome, $tipo, $prefixo, $local_id, $tamanho_senha]);
                 $response['success'] = true;
                 $response['message'] = 'Fila criada com sucesso!';
                 $response['redirect'] = 'index.php';
@@ -108,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipo = $_POST['tipo'];
         $prefixo = strtoupper(trim($_POST['prefixo']));
         $local_id = (int)$_POST['local_id'];
+        $tamanho_senha = isset($_POST['tamanho_senha']) ? (int)$_POST['tamanho_senha'] : 3;
         
         if (empty($nome)) {
             $response['message'] = 'O nome da fila é obrigatório';
@@ -115,12 +119,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response['message'] = 'O prefixo da fila é obrigatório';
         } elseif (strlen($prefixo) > 5) {
             $response['message'] = 'O prefixo deve ter no máximo 5 caracteres';
+        } elseif ($tamanho_senha < 1 || $tamanho_senha > 6) {
+            $response['message'] = 'O tamanho da senha deve estar entre 1 e 6 dígitos';
         } elseif (prefixoExiste($prefixo, $local_id, $id)) {
             $response['message'] = 'Este prefixo já está em uso para o local selecionado';
         } else {
             try {
-                $stmt = $pdo->prepare("UPDATE filas SET nome = ?, tipo = ?, prefixo = ?, local_id = ? WHERE id = ?");
-                $stmt->execute([$nome, $tipo, $prefixo, $local_id, $id]);
+                $stmt = $pdo->prepare("UPDATE filas SET nome = ?, tipo = ?, prefixo = ?, local_id = ?, tamanho_senha = ? WHERE id = ?");
+                $stmt->execute([$nome, $tipo, $prefixo, $local_id, $tamanho_senha, $id]);
                 $response['success'] = true;
                 $response['message'] = 'Fila atualizada com sucesso!';
                 $response['redirect'] = 'index.php';
