@@ -9,12 +9,8 @@ if (!isset($_GET['local_id'])) {
 
 $local_id = intval($_GET['local_id']);
 
-// Buscar os guichês do local especificado que estão ativos e disponíveis
-$sql = "SELECT id, nome FROM guiches 
-        WHERE local_id = :local_id 
-        AND status_ativo = 'ativo' 
-        AND status_uso = 'disponivel' 
-        ORDER BY nome";
+// Buscar os guichês do local especificado
+$sql = "SELECT id, nome FROM guiches WHERE local_id = :local_id ORDER BY nome";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['local_id' => $local_id]);
 $guiches = $stmt->fetchAll();
