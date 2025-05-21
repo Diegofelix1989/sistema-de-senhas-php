@@ -11,6 +11,10 @@ $usuario = $stmt->fetch();
 
 if ($usuario && password_verify($senha, $usuario['senha'])) {
     $_SESSION['usuario'] = $usuario;
+
+    $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['usuario_nome'] = $usuario['nome'];
+
     if ($usuario['tipo'] == 'admin') {
         header("Location: admin/index.php");
     } else {
