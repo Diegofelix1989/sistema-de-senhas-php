@@ -181,7 +181,7 @@ CREATE PROCEDURE resetar_tickets()
 BEGIN
     DECLARE done INT DEFAULT 0;
     DECLARE filaId INT;
-    DECLARE resetTipo ENUM('nunca', 'diario', 'semanal', 'mensal', 'anual', 'manual');
+    DECLARE resetTipo VARCHAR(10);
     DECLARE referencia VARCHAR(20);
 
     DECLARE filas_cursor CURSOR FOR 
@@ -218,6 +218,7 @@ BEGIN
     CLOSE filas_cursor;
 END $$
 DELIMITER ;
+
 
 -- Ativar o agendador de eventos (executar manualmente uma vez)
 SET GLOBAL event_scheduler = ON;
