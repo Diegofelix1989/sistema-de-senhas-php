@@ -1,89 +1,78 @@
 <?php
 // Incluir o controlador que contém toda a lógica de backend
 require_once 'usuarios_controller.php';
+include '../header.php';
+include '../sidebar.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Gerenciamento de Usuários</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        .table-actions {
-            white-space: nowrap;
-        }
-    </style>
-</head>
-<body class="bg-light">
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Gerenciamento de Usuários</h2>
-            <div>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
-                    <i class="bi bi-plus-circle"></i> Novo Usuário
-                </button>
-                <a href="../index.php" class="btn btn-secondary ms-2">
-                    <i class="bi bi-arrow-left"></i> Voltar
-                </a>
+    <!-- Conteúdo Principal -->
+    <div class="flex-grow-1">
+        
+        <div class="p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gerenciamento de Usuários</h2>
+                <div>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
+                        <i class="bi bi-plus-circle"></i> Novo Usuário
+                    </button>
+                    <a href="../index.php" class="btn btn-secondary ms-2">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
             </div>
-        </div>
-        
-        <!-- Alertas para feedback -->
-        <div id="alertArea"></div>
-        
-        <!-- Tabela de Usuários -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Tipo</th>
-                                <th>Cadastrado em</th>
-                                <th class="text-end">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($usuarios)): ?>
+            <!-- Alertas para feedback -->
+            <div id="alertArea"></div>
+            <!-- Tabela de Usuários -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td colspan="6" class="text-center py-3">Nenhum usuário cadastrado.</td>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Tipo</th>
+                                    <th>Cadastrado em</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($usuarios as $usuario): ?>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($usuarios)): ?>
                                     <tr>
-                                        <td><?= $usuario['id'] ?></td>
-                                        <td><?= htmlspecialchars($usuario['nome']) ?></td>
-                                        <td><?= htmlspecialchars($usuario['email']) ?></td>
-                                        <td>
-                                            <?php if ($usuario['tipo'] == 'admin'): ?>
-                                                <span class="badge bg-danger">Administrador</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-primary">Atendente</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= date('d/m/Y H:i', strtotime($usuario['criado_em'])) ?></td>
-                                        <td class="text-end table-actions">
-                                            <button type="button" class="btn btn-sm btn-warning edit-btn" 
-                                                    data-id="<?= $usuario['id'] ?>">
-                                                <i class="bi bi-pencil"></i> Editar
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger delete-btn"
-                                                    data-id="<?= $usuario['id'] ?>" 
-                                                    data-nome="<?= htmlspecialchars($usuario['nome']) ?>"
-                                                    <?= ($_SESSION['usuario']['id'] == $usuario['id']) ? 'disabled' : '' ?>>
-                                                <i class="bi bi-trash"></i> Excluir
-                                            </button>
-                                        </td>
+                                        <td colspan="6" class="text-center py-3">Nenhum usuário cadastrado.</td>
                                     </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                                <?php else: ?>
+                                    <?php foreach ($usuarios as $usuario): ?>
+                                        <tr>
+                                            <td><?= $usuario['id'] ?></td>
+                                            <td><?= htmlspecialchars($usuario['nome']) ?></td>
+                                            <td><?= htmlspecialchars($usuario['email']) ?></td>
+                                            <td>
+                                                <?php if ($usuario['tipo'] == 'admin'): ?>
+                                                    <span class="badge bg-danger">Administrador</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-primary">Atendente</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?= date('d/m/Y H:i', strtotime($usuario['criado_em'])) ?></td>
+                                            <td class="text-end table-actions">
+                                                <button type="button" class="btn btn-sm btn-warning edit-btn" 
+                                                        data-id="<?= $usuario['id'] ?>">
+                                                    <i class="bi bi-pencil"></i> Editar
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                                        data-id="<?= $usuario['id'] ?>" 
+                                                        data-nome="<?= htmlspecialchars($usuario['nome']) ?>"
+                                                        <?= ($_SESSION['usuario']['id'] == $usuario['id']) ? 'disabled' : '' ?>>
+                                                    <i class="bi bi-trash"></i> Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -350,5 +339,4 @@ require_once 'usuarios_controller.php';
             });
         });
     </script>
-</body>
-</html>
+<?php include '../footer.php'; ?>

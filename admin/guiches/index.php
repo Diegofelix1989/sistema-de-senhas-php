@@ -1,9 +1,12 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] !== 'admin') {
-    header('Location: ../index.php');
-    exit();
-}
+//session_start();
+//if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] !== 'admin') {
+//    header('Location: ../index.php');
+//    exit();
+    
+//}
+
+
 include_once __DIR__ . '/../../includes/conexao.php';
 
 // Buscar todos os locais para os dropdowns dos modais
@@ -142,23 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
+
+include '../header.php';
+include '../sidebar.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Gerenciamento de Guichês</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        .table-actions {
-            white-space: nowrap;
-        }
-    </style>
-</head>
-<body class="bg-light">
-    <div class="container py-4">
+<!-- Conteúdo Principal -->
+<div class="flex-grow-1">
+    
+    <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Gerenciamento de Guichês</h2>
             <div>
@@ -220,297 +214,218 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal para Criar Guichê -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="createModalLabel">Novo Guichê</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <form id="createForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="create-nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="create-nome" name="nome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-local" class="form-label">Local</label>
-                            <select class="form-select" id="create-local" name="local_id" required>
-                                <option value="">Selecione um local</option>
-                                <?php foreach ($locais as $local): ?>
-                                    <option value="<?= $local['id'] ?>"><?= htmlspecialchars($local['nome']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-fila" class="form-label">Fila</label>
-                            <select class="form-select" id="create-fila" name="fila_id" required disabled>
-                                <option value="">Selecione um local primeiro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">Salvar</button>
-                    </div>
-                </form>
+<!-- Modal para Criar Guichê -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="createModalLabel">Novo Guichê</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
-        </div>
-    </div>
-
-    <!-- Modal para Editar Guichê -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title" id="editModalLabel">Editar Guichê</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <form id="editForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="edit-id" name="id">
-                        <div class="mb-3">
-                            <label for="edit-nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="edit-nome" name="nome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-local" class="form-label">Local</label>
-                            <select class="form-select" id="edit-local" name="local_id" required>
-                                <option value="">Selecione um local</option>
-                                <?php foreach ($locais as $local): ?>
-                                    <option value="<?= $local['id'] ?>"><?= htmlspecialchars($local['nome']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-fila" class="form-label">Fila</label>
-                            <select class="form-select" id="edit-fila" name="fila_id" required>
-                                <option value="">Selecione um local primeiro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">Atualizar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Confirmar Exclusão -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
+            <form id="createForm">
                 <div class="modal-body">
-                    <p>Tem certeza que deseja excluir o guichê <strong id="delete-nome"></strong>?</p>
-                    <p class="text-danger"><small>Esta ação não pode ser desfeita.</small></p>
+                    <div class="mb-3">
+                        <label for="create-nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="create-nome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-local" class="form-label">Local</label>
+                        <select class="form-select" id="create-local" name="local_id" required>
+                            <option value="">Selecione um local</option>
+                            <?php foreach ($locais as $local): ?>
+                                <option value="<?= $local['id'] ?>"><?= htmlspecialchars($local['nome']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-fila" class="form-label">Fila</label>
+                        <select class="form-select" id="create-fila" name="fila_id" required disabled>
+                            <option value="">Selecione um local primeiro</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form id="deleteForm">
-                        <input type="hidden" id="delete-id" name="id">
-                        <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
-                    </form>
+                    <button type="submit" class="btn btn-success">Salvar</button>
                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Guichê -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="editModalLabel">Editar Guichê</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form id="editForm">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-id" name="id">
+                    <div class="mb-3">
+                        <label for="edit-nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="edit-nome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-local" class="form-label">Local</label>
+                        <select class="form-select" id="edit-local" name="local_id" required>
+                            <option value="">Selecione um local</option>
+                            <?php foreach ($locais as $local): ?>
+                                <option value="<?= $local['id'] ?>"><?= htmlspecialchars($local['nome']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-fila" class="form-label">Fila</label>
+                        <select class="form-select" id="edit-fila" name="fila_id" required>
+                            <option value="">Selecione um local primeiro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Confirmar Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o guichê <strong id="delete-nome"></strong>?</p>
+                <p class="text-danger"><small>Esta ação não pode ser desfeita.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm">
+                    <input type="hidden" id="delete-id" name="id">
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Função para mostrar alertas
-            function showAlert(message, type = 'success') {
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-                alertDiv.innerHTML = `
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-                `;
-                document.getElementById('alertArea').appendChild(alertDiv);
-                
-                // Auto-fechar após 5 segundos
-                setTimeout(() => {
-                    const bsAlert = new bootstrap.Alert(alertDiv);
-                    bsAlert.close();
-                }, 5000);
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Função para mostrar alertas
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            `;
+            document.getElementById('alertArea').appendChild(alertDiv);
+            
+            // Auto-fechar após 5 segundos
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alertDiv);
+                bsAlert.close();
+            }, 5000);
+        }
+        
+        // Função para carregar filas por local selecionado
+        function carregarFilasPorLocal(localId, elementoFila, filaId = null) {
+            if (!localId) {
+                elementoFila.innerHTML = '<option value="">Selecione um local primeiro</option>';
+                elementoFila.disabled = true;
+                return;
             }
             
-            // Função para carregar filas por local selecionado
-            function carregarFilasPorLocal(localId, elementoFila, filaId = null) {
-                if (!localId) {
-                    elementoFila.innerHTML = '<option value="">Selecione um local primeiro</option>';
-                    elementoFila.disabled = true;
-                    return;
+            const formData = new FormData();
+            formData.append('action', 'get_filas_by_local');
+            formData.append('local_id', localId);
+            
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    elementoFila.disabled = false;
+                    
+                    let options = '<option value="">Selecione uma fila</option>';
+                    if (data.data.length === 0) {
+                        options = '<option value="">Nenhuma fila disponível para este local</option>';
+                        elementoFila.disabled = true;
+                    } else {
+                        data.data.forEach(fila => {
+                            const selected = filaId && filaId == fila.id ? 'selected' : '';
+                            options += `<option value="${fila.id}" ${selected}>${fila.nome}</option>`;
+                        });
+                    }
+                    elementoFila.innerHTML = options;
+                } else {
+                    showAlert(data.message, 'danger');
                 }
-                
+            })
+            .catch(error => {
+                showAlert('Erro ao carregar filas: ' + error, 'danger');
+            });
+        }
+        
+        // Atualizar filas quando local é alterado (criar)
+        document.getElementById('create-local').addEventListener('change', function() {
+            carregarFilasPorLocal(this.value, document.getElementById('create-fila'));
+        });
+        
+        // Atualizar filas quando local é alterado (editar)
+        document.getElementById('edit-local').addEventListener('change', function() {
+            carregarFilasPorLocal(this.value, document.getElementById('edit-fila'));
+        });
+        
+        // Criar novo guichê
+        const createForm = document.getElementById('createForm');
+        createForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(createForm);
+            formData.append('action', 'create');
+            
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createModal'));
+                    modal.hide();
+                    createForm.reset();
+                    showAlert(data.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao processar solicitação: ' + error, 'danger');
+            });
+        });
+        
+        // Carregar dados para edição
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
                 const formData = new FormData();
-                formData.append('action', 'get_filas_by_local');
-                formData.append('local_id', localId);
-                
-                fetch('index.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        elementoFila.disabled = false;
-                        
-                        let options = '<option value="">Selecione uma fila</option>';
-                        if (data.data.length === 0) {
-                            options = '<option value="">Nenhuma fila disponível para este local</option>';
-                            elementoFila.disabled = true;
-                        } else {
-                            data.data.forEach(fila => {
-                                const selected = filaId && filaId == fila.id ? 'selected' : '';
-                                options += `<option value="${fila.id}" ${selected}>${fila.nome}</option>`;
-                            });
-                        }
-                        elementoFila.innerHTML = options;
-                    } else {
-                        showAlert(data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showAlert('Erro ao carregar filas: ' + error, 'danger');
-                });
-            }
-            
-            // Atualizar filas quando local é alterado (criar)
-            document.getElementById('create-local').addEventListener('change', function() {
-                carregarFilasPorLocal(this.value, document.getElementById('create-fila'));
-            });
-            
-            // Atualizar filas quando local é alterado (editar)
-            document.getElementById('edit-local').addEventListener('change', function() {
-                carregarFilasPorLocal(this.value, document.getElementById('edit-fila'));
-            });
-            
-            // Criar novo guichê
-            const createForm = document.getElementById('createForm');
-            createForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(createForm);
-                formData.append('action', 'create');
-                
-                fetch('index.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('createModal'));
-                        modal.hide();
-                        createForm.reset();
-                        showAlert(data.message);
-                        setTimeout(() => window.location.reload(), 1000);
-                    } else {
-                        showAlert(data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showAlert('Erro ao processar solicitação: ' + error, 'danger');
-                });
-            });
-            
-            // Carregar dados para edição
-            const editButtons = document.querySelectorAll('.edit-btn');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const formData = new FormData();
-                    formData.append('action', 'get');
-                    formData.append('id', id);
-                    
-                    fetch('index.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const guiche = data.data;
-                            document.getElementById('edit-id').value = guiche.id;
-                            document.getElementById('edit-nome').value = guiche.nome;
-                            document.getElementById('edit-local').value = guiche.local_id;
-                            
-                            // Carregar filas para o local selecionado e selecionar a fila atual
-                            carregarFilasPorLocal(guiche.local_id, document.getElementById('edit-fila'), guiche.fila_id);
-                            
-                            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                            editModal.show();
-                        } else {
-                            showAlert(data.message, 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        showAlert('Erro ao carregar dados: ' + error, 'danger');
-                    });
-                });
-            });
-            
-            // Atualizar guichê
-            const editForm = document.getElementById('editForm');
-            editForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(editForm);
-                formData.append('action', 'update');
-                
-                fetch('index.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                        modal.hide();
-                        showAlert(data.message);
-                        setTimeout(() => window.location.reload(), 1000);
-                    } else {
-                        showAlert(data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showAlert('Erro ao processar solicitação: ' + error, 'danger');
-                });
-            });
-            
-            // Preparar confirmação de exclusão
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const nome = this.dataset.nome;
-                    
-                    document.getElementById('delete-id').value = id;
-                    document.getElementById('delete-nome').textContent = nome;
-                    
-                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                    deleteModal.show();
-                });
-            });
-            
-            // Excluir guichê
-            const deleteForm = document.getElementById('deleteForm');
-            deleteForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const id = document.getElementById('delete-id').value;
-                const formData = new FormData();
-                formData.append('action', 'delete');
+                formData.append('action', 'get');
                 formData.append('id', id);
                 
                 fetch('index.php', {
@@ -520,29 +435,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                        modal.hide();
-                        showAlert(data.message);
-                        setTimeout(() => window.location.reload(), 1000);
+                        const guiche = data.data;
+                        document.getElementById('edit-id').value = guiche.id;
+                        document.getElementById('edit-nome').value = guiche.nome;
+                        document.getElementById('edit-local').value = guiche.local_id;
+                        
+                        // Carregar filas para o local selecionado e selecionar a fila atual
+                        carregarFilasPorLocal(guiche.local_id, document.getElementById('edit-fila'), guiche.fila_id);
+                        
+                        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                        editModal.show();
                     } else {
                         showAlert(data.message, 'danger');
                     }
                 })
                 .catch(error => {
-                    showAlert('Erro ao processar solicitação: ' + error, 'danger');
-                });
-            });
-            
-            // Pré-selecionar filas para os guichês existentes
-            const filas = <?= json_encode($filas) ?>;
-            
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Este código será executado quando o botão for clicado
-                    // Já tratado no evento de carregamento de dados para edição
+                    showAlert('Erro ao carregar dados: ' + error, 'danger');
                 });
             });
         });
-    </script>
-</body>
-</html>
+        
+        // Atualizar guichê
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(editForm);
+            formData.append('action', 'update');
+            
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    modal.hide();
+                    showAlert(data.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao processar solicitação: ' + error, 'danger');
+            });
+        });
+        
+        // Preparar confirmação de exclusão
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const nome = this.dataset.nome;
+                
+                document.getElementById('delete-id').value = id;
+                document.getElementById('delete-nome').textContent = nome;
+                
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                deleteModal.show();
+            });
+        });
+        
+        // Excluir guichê
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('delete-id').value;
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('id', id);
+            
+            fetch('index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                    modal.hide();
+                    showAlert(data.message);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao processar solicitação: ' + error, 'danger');
+            });
+        });
+        
+        // Pré-selecionar filas para os guichês existentes
+        const filas = <?= json_encode($filas) ?>;
+        
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Este código será executado quando o botão for clicado
+                // Já tratado no evento de carregamento de dados para edição
+            });
+        });
+    });
+</script>
+<?php include '../footer.php'; ?>

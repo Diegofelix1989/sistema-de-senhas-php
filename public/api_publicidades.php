@@ -25,7 +25,7 @@ foreach ($publicidades as &$p) {
     // Remover "../" e garantir que o caminho seja acessível pela URL do servidor
     $p['media_path'] = str_replace('../', '', $p['media_path']);
     // Adiciona o domínio completo ao caminho para formar a URL completa
-    $p['media_path'] = 'http://localhost/sistema-de-senhas-php/admin/' . $p['media_path'];
+    $p['media_path'] = 'http://192.168.0.108/sistema-de-senhas-php002/admin/' . $p['media_path'];
 }
 
 echo json_encode($publicidades);
